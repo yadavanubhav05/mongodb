@@ -1,0 +1,9 @@
+-  hosts: all
+   become: yes
+   roles:
+     - mongo-install
+
+# -  hosts: controlmachine
+#    become: yes
+#    roles:
+#      - cleanup
