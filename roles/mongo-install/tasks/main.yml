@@ -1,0 +1,52 @@
+- include: pre-reqs.yml
+  when:
+    "'mongodb' in group_names"
+  tags: prereqs
+  become: true
+
+
+- include: keyFile.yml
+  when:
+   "ansible_hostname == groups['mongodb'][0]"
+  tags: mongo_key
+
+- include: keyFile_distri.yml
+  become: true
+  tags: mongo_key
+
+- include: ca-keys-shell.yml
+  when:
+     "ansible_hostname == groups['rootca'][0]"
+  become: true
+  tags: ca
+
+- include: distri-ca.yml
+  tags: ca
+  become: true
+
+- include: distri-ca-mongo1.yml
+  when:
+    "ansible_hostname == groups['mongodb'][0]"
+  tags: ca
+  become: true
+
+- include: host-certificates.yml
+  when:
+    "ansible_hostname == groups['mongodb'][0]"
+  tags: ssl
+  become: true
+
+- include: distri-host-certs.yml
+  tags: ssl
+  become: true
+
+- include: mongo-install.yml
+  when:
+    "'mongodb' in group_names"
+  tags: mongo
+  become: true
+
+- include: cleanup.yml
+  tags: mongo
+  become: true
+  delegate_to: 127.0.0.1

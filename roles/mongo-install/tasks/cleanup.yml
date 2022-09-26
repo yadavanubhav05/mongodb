@@ -1,0 +1,3 @@
+- name: delete files in temporary dir
+  command: rm -rf /tmp/mongo
+  

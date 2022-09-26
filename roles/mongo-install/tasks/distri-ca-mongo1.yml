@@ -1,0 +1,16 @@
+- name: Create a CA directory if it does not exist
+  file:
+    path: /tmp/mongo/
+    state: directory
+    mode: '0700'
+    owner: root
+    group: root
+
+- name: distribute CA public certificate
+  copy:
+    src: /tmp/mongo/{{ hostvars[groups['rootca'][0]].inventory_hostname }}/tmp/mongo/{{ item }}
+    dest: /tmp/mongo/
+    remote_src: no
+  with_items:
+    - MongoCA.crt
+    - MongoCA.key

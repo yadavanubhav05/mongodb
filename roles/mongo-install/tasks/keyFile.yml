@@ -1,0 +1,24 @@
+- name: Capture if key file exists
+  stat:
+    path: /etc/mongo/rset.key
+  register: key_file
+
+- name: Create a temp dir for key file
+  file:
+    path: /etc/mongo
+    state: directory
+    mode: '0700'
+    owner: root
+    group: root
+
+- name: Create key file for access control
+  shell: "openssl rand -base64 755 > /etc/mongo/rset.key"
+  # when:
+  #   - key_file.exists == false
+
+- name: fetch key file locally
+  fetch:
+    src: /etc/mongo/{{ item }}
+    dest: /tmp/
+  with_items:
+    - rset.key

@@ -1,0 +1,6 @@
+- name: distribute key file on all nodes
+  copy:
+    src: /tmp/{{ hostvars[groups['mongodb'][0]].inventory_hostname }}/etc/mongo/rset.key
+    dest: /etc/mongo/
+    remote_src: no
+  loop: "{{ groups['mongodb'] }}"

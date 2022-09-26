@@ -1,0 +1,67 @@
+# Stop MongoDB  service
+- name: Stop MongoDB service
+  shell: "systemctl stop {{item}}"
+  with_items:
+    - mongod
+  ignore_errors: True
+
+- name: reload services, in all cases
+  shell: "systemctl daemon-reload"
+  ignore_errors: true
+
+# setup mongo repo
+- template:
+    src: "{{item}}.j2"
+    dest: "/etc/yum.repos.d/{{item}}"
+    owner: root
+    group: root
+    mode: 0744
+    backup: yes
+  with_items:
+    - mongo.repo
+
+- name: Install MongoDB
+  yum:
+    name: mongodb-org
+    update_cache: yes
+    state: installed
+
+- name: remove default configuration file
+  file:
+    path: /etc/mongod.conf
+    state: absent
+
+- name: Change permissions for key file
+  file:
+    path: /etc/mongo/rset.key
+    owner: mongod
+    group: mongod
+    mode: '0400'
+    
+- name: Create a directory if it does not exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: yes
+    mode: '0700'
+    owner: mongod
+    group: mongod
+  with_items:
+    - /etc/mongo/ssl/
+    - /etc/mongo
+
+# copy mongo configuration file
+- template:
+    src: mongod.conf.j2
+    dest: /etc/mongod.conf
+    owner: mongod
+    group: mongod
+    mode: 0744
+    backup: yes
+  loop: "{{ groups['mongodb'] }}"
+
+- name: Start mongodb service
+  service:
+    name: mongod
+    state: started
+    enabled: yes

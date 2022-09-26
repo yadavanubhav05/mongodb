@@ -1,0 +1,14 @@
+- name: Create a cert directory if it does not exist
+  file:
+    path: /etc/mongo/ssl/
+    state: directory
+    mode: '0700'
+    owner: root
+    group: root
+
+- name: distribute host pem certificates
+  copy:
+    src: /tmp/mongo/{{ hostvars[groups['mongodb'][0]].inventory_hostname }}/tmp/mongo/{{ item }}.pem
+    dest: /etc/mongo/ssl/
+    remote_src: no
+  loop: "{{ groups['mongodb'] }}"

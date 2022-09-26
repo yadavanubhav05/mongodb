@@ -1,0 +1,55 @@
+- name: Disable SELinux (restart reqd)
+  selinux:
+    state: disabled
+
+- name: set transparent hugepage option
+  become: true
+  blockinfile:
+   backup: yes
+   path: /etc/rc.d/rc.local
+   mode: 0755
+   create: yes
+   state: present
+   block: |
+     #Remove THP feature (perfs issues)
+     if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
+       echo never > /sys/kernel/mm/transparent_hugepage/enabled
+     fi
+     if test -f /sys/kernel/mm/transparent_hugepage/defrag; then
+       echo never > /sys/kernel/mm/transparent_hugepage/defrag
+     fi
+
+     sysctl vm.swappiness=1
+     sleep 10
+
+     exit 0
+
+- name: configure system settings, file descriptors and number of threads for all nodes
+  become: true
+  pam_limits:
+      domain: mongod
+      limit_type: "{{item.limit_type}}"
+      limit_item: "{{item.limit_item}}"
+      value: "{{item.value}}"
+  with_items:
+        - { limit_type: 'soft', limit_item: 'fsize', value: 'unlimited' }
+        - { limit_type: 'hard', limit_item: 'fsize', value: 'unlimited' }
+        - { limit_type: 'soft', limit_item: 'cpu', value: 'unlimited' }
+        - { limit_type: 'hard', limit_item: 'cpu', value: 'unlimited' }
+        - { limit_type: 'soft', limit_item: 'as', value: 'unlimited' }
+        - { limit_type: 'hard', limit_item: 'as', value: 'unlimited' }
+        - { limit_type: 'soft', limit_item: 'nofile', value: 64000 }
+        - { limit_type: 'hard', limit_item: 'nofile', value: 64000 }
+        - { limit_type: 'soft', limit_item: 'nproc', value: 64000 }
+        - { limit_type: 'hard', limit_item: 'nproc', value: 64000 }
+
+- name: set vm.swappiness to 1
+  sysctl:
+    name: vm.swappiness
+    value: 1
+    state: present
+
+- name: update glibc
+  yum:
+    name: glibc
+    state: latest
