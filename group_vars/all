@@ -1,20 +1,20 @@
 #repo
 replSetName: "mongors01"
-baseurl: "http://10.71.4.197/mirror/mongodb/repo.mongodb.org/yum/redhat/7/mongodb-org/4.4/x86_64/"
-gpgkey: "http://10.71.4.197/mirror/mongodb/repo.mongodb.org/yum/redhat/7/mongodb-org/4.4/x86_64/server-4.4.asc"
+baseurl: "http://<IP>/mirror/mongodb/repo.mongodb.org/yum/redhat/7/mongodb-org/4.4/x86_64/"
+gpgkey: "http://<IP>/mirror/mongodb/repo.mongodb.org/yum/redhat/7/mongodb-org/4.4/x86_64/server-4.4.asc"
 DOMAIN: "DOMAIN_NAME"
 mongo_ssl: "true"
 
 challenge_password: "mongo_password"
 
 # TLS certificates
-ssl_path: "/etc/security/ocb_ssl/mongo"
-country_name: "FR"
-state: "GRAND OUEST"
-city: "RENNES"
-org_name: "Orange"
-ou_name: "Orange Cloud for Business"
-email: "ocbcsd.bigdata@orange.com"
+ssl_path: "/etc/security/prod_ssl/mongo"
+country_name: "IN"
+state: "HR"
+city: "GGN"
+org_name: "EXAMPLE"
+ou_name: "SUBEXAMPLE"
+email: "yadav.anubhav05@gmail.com"
 
 # MongoDB specifics
 db_path: "/var/lib/mongo"
